@@ -5,7 +5,7 @@ module.exports = (req, res, next) => {
     const token = req.headers.authorization.split(" ")[1];
 
     //verify token from every incomming request
-    const decodedToken = jwt.verify(token, "secret_key");
+    const decodedToken = jwt.verify(token, process.env.SECRET_KEY);
 
     //for verifying user for perticular posts ,add usrdta into evry req
     req.userData = { email: decodedToken.email, userId: decodedToken.userId };

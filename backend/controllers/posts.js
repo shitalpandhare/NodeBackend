@@ -7,15 +7,8 @@ exports.createPost = (req, res, next) => {
   const title = req.body.title;
   const content = req.body.content;
 
-  if (!req.body.title || !req.body.content) {
-    return res.status(400).json({
-      message: "Please fill in all the required fields.",
-      fields: ["title", "content"],
-    });
-  }
-
   console.log(req.userData);
-  // return res.status(200).json({});
+
   const post = new Post(id, title, content, req.userData.userId);
   post
     .save()
@@ -91,7 +84,7 @@ exports.deletePost = (req, res, next) => {
     .then((data) => {
       if (data[0].affectedRows == 0) {
         return res
-          .status(500)
+          .status(401)
           .json({ message: "error occure while post  deleting !" });
       }
 
@@ -110,13 +103,6 @@ exports.updatePost = (req, res, next) => {
   const content = req.body.content;
   const userId = req.userData.userId;
 
-  if (!id || !title || !content) {
-    return res.status(400).json({
-      message: "Please fill in all the required fields.",
-      fields: ["id", "title", "content"],
-    });
-  }
-
   const post = new Post(id, title, content, userId);
   post
     .updatePost()
@@ -125,7 +111,7 @@ exports.updatePost = (req, res, next) => {
       if (data[0].affectedRows == 0) {
         console.log("heree");
         return res
-          .status(500)
+          .status(401)
           .json({ message: "error occure while  updating" });
       }
       return res.status(201).json({ message: "post updated sucessfully!" });
