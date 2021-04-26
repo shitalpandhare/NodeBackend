@@ -8,7 +8,8 @@ exports.userSignup = async (req, res, next) => {
   try {
     const hash = await bcrypt.hash(req.body.password, 10);
 
-    const user = new User(null, (email = req.body.email), (password = hash));
+    id = new Date().toISOString();
+    const user = new User(id, (email = req.body.email), (password = hash));
 
     const result = await user.save();
 
@@ -32,7 +33,6 @@ exports.userLogin = async (req, res, next) => {
     if (!user[0].length) {
       return res.status(401).json({ message: "Auth fail !" });
     } else {
-      console.log("in else");
       fetchedUser = user[0][0];
 
       result = await bcrypt.compare(req.body.password, fetchedUser.password);
@@ -41,6 +41,8 @@ exports.userLogin = async (req, res, next) => {
     if (!result) {
       return res.status(401).json({ message: "Auth fail" });
     } else {
+      //
+
       const token = jwt.sign(
         { email: fetchedUser.email, userId: fetchedUser.id },
         process.env.SECRET_KEY,

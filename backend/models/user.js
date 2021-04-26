@@ -8,6 +8,7 @@ module.exports = class User {
   }
 
   save() {
+    console.log("in save");
     return db.execute("INSERT INTO user(id,email,password) VALUES(?,?,?)", [
       this.id,
       this.email,

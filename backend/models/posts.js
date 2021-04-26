@@ -32,6 +32,7 @@ module.exports = class Post {
   }
 
   updatePost() {
+    console.log(this.id, this.userId);
     return db.execute(
       "UPDATE  posts SET title=?,content=? where id=? AND userId=?",
       [this.title, this.content, this.id, this.userId]
