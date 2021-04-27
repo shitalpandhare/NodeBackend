@@ -19,4 +19,11 @@ module.exports = class User {
   static findByEmail(email) {
     return db.execute("SELECT * FROM user WHERE email=?", [email]);
   }
+
+  static saveRefreshToken(refreshToken, userId) {
+    return db.execute("UPDATE user SET refreshToken=? where id=?", [
+      refreshToken,
+      userId,
+    ]);
+  }
 };

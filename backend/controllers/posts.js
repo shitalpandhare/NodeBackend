@@ -11,12 +11,12 @@ exports.createPost = async (req, res, next) => {
 
   //if use passport jwt
   const userId = req.user[0][0].id;
-  console.log(req.userData);
 
-  const post = new Post(title, content, userId);
+  const post = new Post(null, title, content, userId);
   const data = await post.save();
 
   try {
+    console.log(data);
     if (data.affectedRows == 0) {
       return res
         .status(500)

@@ -46,12 +46,38 @@ exports.userLogin = async (req, res, next) => {
       const token = jwt.sign(
         { email: fetchedUser.email, userId: fetchedUser.id },
         process.env.SECRET_KEY,
-        { expiresIn: "1h" }
+        { expiresIn: 30 }
       );
-      res.status(200).json({ token: token, expiresIn: 3600 });
+
+      const refreshToken = jwt.sign(
+        { email: fetchedUser.email, userId: fetchedUser.id },
+        process.env.REFRESH_TOKEN_SECRET_KEY,
+        { expiresIn: "7d" }
+      );
+
+      //store refresh token in database
+
+      const reftoken = await User.saveRefreshToken(
+        refreshToken,
+        fetchedUser.id
+      );
+
+      if (reftoken[0].affectedRows == 0) {
+        return res
+          .status(403)
+          .json({ message: "token is not stored in  database!" });
+      }
+      res.status(200).json([
+        { token: token, expiresIn: "10s" },
+        { refreshToken: refreshToken, expiresIn: "7d" },
+      ]);
     }
   } catch (err) {
     console.log(err);
     return res.status(401).json({ message: "Auth fail" });
   }
+};
+
+exports.refreshToken = (req, res, next) => {
+  refToken = req.body.refreshToken;
 };

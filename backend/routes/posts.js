@@ -9,7 +9,7 @@ const passportAuth = require("../middleware/passport");
 
 router.post(
   "",
-  passport.authenticate("jwt", { session: false }),
+  passportAuth,
   postsAuth.createPostAuth,
   postsController.createPost
 );

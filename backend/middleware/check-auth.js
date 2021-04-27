@@ -4,8 +4,9 @@ module.exports = (req, res, next) => {
   try {
     const token = req.headers.authorization.split(" ")[1];
     console.log("in jwt");
+    console.log(token.email);
     //verify token from every incomming request
-    const decodedToken = jwt.verify(token, process.env.SECRET_KEY);
+    const decodedToken = jwt.verify(token.email, process.env.SECRET_KEY);
 
     //for verifying user for perticular posts ,add usrdta into evry req
     req.userData = { email: decodedToken.email, userId: decodedToken.userId };
