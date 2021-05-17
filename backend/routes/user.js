@@ -11,4 +11,6 @@ router.get("/admin/:id", userController.getAdminById);
 router.put("/admin/:id", userController.updateAdmin);
 router.get("/admin/search/:searchText", userController.searchAdmins);
 router.post("/admin/sort", userController.sortAdmins);
+router.get("/admin/searchsort/:searchText", userController.searchSortAdmins);
+
 module.exports = router;

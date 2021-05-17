@@ -66,7 +66,7 @@ module.exports = class User {
     );
   }
 
-  static searchAdmins(searchText) {
+  static searchAdmins(searchText, limit, offset) {
     return db.execute(
       "SELECT * FROM user WHERE role='admin' AND (firstname LIKE '%" +
         searchText +
@@ -78,16 +78,48 @@ module.exports = class User {
         searchText +
         "%' OR address LIKE '%" +
         searchText +
-        "%')"
+        "%')" +
+        " limit " +
+        limit +
+        " OFFSET " +
+        offset
     );
   }
 
-  static sortAdmins(active, direction) {
+  static sortAdmins(active, direction, limit, offset) {
     return db.execute(
       "SELECT * FROM user WHERE  role='admin' ORDER BY " +
         active +
         " " +
-        direction
+        direction +
+        " limit " +
+        limit +
+        " OFFSET " +
+        offset
+    );
+  }
+
+  static searchSortAdmins(searchText, active, direction, limit, offset) {
+    return db.execute(
+      "SELECT * FROM user WHERE role='admin' AND (firstname LIKE '%" +
+        searchText +
+        "%' OR  lastname LIKE '%" +
+        searchText +
+        "%' OR email LIKE '%" +
+        searchText +
+        "%' OR gender LIKE '%" +
+        searchText +
+        "%' OR address LIKE '%" +
+        searchText +
+        "%')" +
+        " ORDER BY " +
+        active +
+        " " +
+        direction +
+        " limit " +
+        limit +
+        " OFFSET " +
+        offset
     );
   }
 };

@@ -111,10 +111,10 @@ exports.getAllUsers = async (req, res, next) => {
 
   // const users = await User.findAllByRole(role);
   try {
-    const de = db.execute("SELECT * FROM user where role='admin'");
-    de.then((dd) => {
-      count = dd[0].length;
-    });
+    const de = await db.execute("SELECT * FROM user where role='admin'");
+    if (de) {
+      count = de[0].length;
+    }
     if (pageSize && currentPage) {
       limit = pageSize;
       offset = pageSize * (currentPage - 1);
@@ -212,9 +212,33 @@ exports.updateAdmin = async (req, res, next) => {
 
 exports.searchAdmins = async (req, res, next) => {
   const searchText = req.params.searchText;
-
-  const users = await User.searchAdmins(searchText);
+  const pageIndex = +req.query.page;
+  let pageSize = +req.query.pageSize;
+  let users;
+  let count = 0;
   try {
+    const de = await db.execute(
+      " SELECT COUNT(*) as count FROM user WHERE role='admin' AND (firstname LIKE '%" +
+        searchText +
+        "%' OR  lastname LIKE '%" +
+        searchText +
+        "%' OR email LIKE '%" +
+        searchText +
+        "%' OR gender LIKE '%" +
+        searchText +
+        "%' OR address LIKE '%" +
+        searchText +
+        "%')"
+    );
+
+    if (de) {
+      count = de[0][count].count;
+    }
+    if (pageSize && pageIndex) {
+      limit = pageSize;
+      offset = pageSize * (pageIndex - 1);
+      users = await User.searchAdmins(searchText, limit, offset);
+    }
     if (users[0].length == 0) {
       res.status(204).json({
         message: "user is not found with searchText :" + searchText,
@@ -223,6 +247,7 @@ exports.searchAdmins = async (req, res, next) => {
       res.status(200).json({
         message: "user fetched successfully",
         users: users[0],
+        maxSearchedAdmin: count,
       });
     }
   } catch (err) {
@@ -233,9 +258,21 @@ exports.searchAdmins = async (req, res, next) => {
 exports.sortAdmins = async (req, res, next) => {
   const active = req.body.active;
   const direction = req.body.direction;
+  const pageIndex = req.body.pageIndex;
+  let pageSize = req.body.pageSize;
+  let users;
+  let count = 0;
 
-  const users = await User.sortAdmins(active, direction);
+  const de = await db.execute("SELECT * FROM user where role='admin'");
+  if (de) {
+    count = de[0].length;
+  }
   try {
+    if (pageSize && pageIndex) {
+      limit = pageSize;
+      offset = pageSize * (pageIndex - 1);
+      users = await User.sortAdmins(active, direction, limit, offset);
+    }
     if (users[0].length == 0) {
       res.status(204).json({
         message: "data  is not found ",
@@ -244,6 +281,60 @@ exports.sortAdmins = async (req, res, next) => {
       res.status(200).json({
         message: "user fetched successfully",
         users: users[0],
+        maxAdmins: count,
+      });
+    }
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+exports.searchSortAdmins = async (req, res, next) => {
+  const searchText = req.params.searchText;
+  const active = req.query.active;
+  const direction = req.query.direction;
+  const pageIndex = +req.query.page;
+  let pageSize = +req.query.pageSize;
+  let users;
+  let count = 0;
+  try {
+    const de = await db.execute(
+      " SELECT COUNT(*) as count FROM user WHERE role='admin' AND (firstname LIKE '%" +
+        searchText +
+        "%' OR  lastname LIKE '%" +
+        searchText +
+        "%' OR email LIKE '%" +
+        searchText +
+        "%' OR gender LIKE '%" +
+        searchText +
+        "%' OR address LIKE '%" +
+        searchText +
+        "%')"
+    );
+
+    if (de) {
+      count = de[0][count].count;
+    }
+    if (pageSize && pageIndex) {
+      limit = pageSize;
+      offset = pageSize * (pageIndex - 1);
+      users = await User.searchSortAdmins(
+        searchText,
+        active,
+        direction,
+        limit,
+        offset
+      );
+    }
+    if (users[0].length == 0) {
+      res.status(204).json({
+        message: "user is not found with searchText :" + searchText,
+      });
+    } else {
+      res.status(200).json({
+        message: "user fetched successfully",
+        users: users[0],
+        maxSearchedAdmin: count,
       });
     }
   } catch (err) {
